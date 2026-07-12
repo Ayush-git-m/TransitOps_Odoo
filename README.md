@@ -4,6 +4,8 @@ TransitOps is a centralized, end-to-end transport operations platform designed t
 
 ---
 
+https://transit-ops-odoo-mvnz.vercel.app/
+
 ## Target User Roles
 
 * **Fleet Manager**: Oversees fleet assets, vehicle lifecycles, maintenance scheduling, and overall operational efficiency.
