@@ -65,7 +65,27 @@ const getAllTrips = async (req, res) => {  try {
 
     }};
 
-const getTripById = async (req, res) => {};
+const getTripById = async (req, res) => {
+
+    try {
+
+        const trip = await tripService.getTripById(req.params.id);
+
+        return res.status(200).json({
+            success: true,
+            data: trip
+        });
+
+    } catch (error) {
+
+        return res.status(404).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+
+};
 
 
 const completeTrip = async (req, res) => { try {
@@ -88,7 +108,28 @@ const completeTrip = async (req, res) => { try {
     }
 };
 
-const cancelTrip = async (req, res) => {};
+const cancelTrip = async (req, res) => {
+
+    try {
+
+        const result = await tripService.cancelTrip(req.params.id);
+
+        return res.status(200).json({
+            success: true,
+            message: "Trip Cancelled Successfully",
+            data: result
+        });
+
+    } catch (error) {
+
+        return res.status(400).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+
+};
 
 module.exports = {
     createTrip,

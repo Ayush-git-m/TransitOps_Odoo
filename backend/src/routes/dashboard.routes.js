@@ -35,8 +35,9 @@ router.get(
 router.get(
     "/analytics",
     auth,
-    authorize("FINANCIAL_ANALYST"),
+    authorize("FINANCIAL_ANALYST", "FLEET_MANAGER"),
     dashboardController.getAnalytics
 );
+
 
 module.exports = router;

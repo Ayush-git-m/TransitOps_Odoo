@@ -248,9 +248,108 @@ const getAllTrips = async () => {
     return rows;
 };
 
+const cancelTrip = async (tripId) => {
+
+    const connection = await db.getConnection();
+
+    try {
+
+        await connection.beginTransaction();
+
+        const [trip] = await connection.query(
+            "SELECT * FROM trips WHERE id=?",
+            [tripId]
+        );
+
+        if (trip.length === 0) {
+            throw new Error("Trip not found");
+        }
+
+        if (trip[0].status === "COMPLETED") {
+            throw new Error("Completed trip cannot be cancelled");
+        }
+
+        await connection.query(
+            `
+            UPDATE trips
+            SET
+                status='CANCELLED'
+            WHERE id=?
+            `,
+            [tripId]
+        );
+
+        await connection.query(
+            "UPDATE vehicles SET status='AVAILABLE' WHERE id=?",
+            [trip[0].vehicle_id]
+        );
+
+        await connection.query(
+            "UPDATE drivers SET status='AVAILABLE' WHERE id=?",
+            [trip[0].driver_id]
+        );
+
+        await connection.commit();
+
+        return {
+            tripId,
+            status: "CANCELLED"
+        };
+
+    } catch (error) {
+
+        await connection.rollback();
+        throw error;
+
+    } finally {
+
+        connection.release();
+
+    }
+
+};
+
+const getTripById = async (tripId) => {
+
+    const [rows] = await db.query(
+        `
+        SELECT
+            t.id,
+            t.source,
+            t.destination,
+            t.status,
+            t.dispatch_time,
+            t.completion_time,
+
+            v.registration_number,
+
+            d.full_name AS driver_name
+
+        FROM trips t
+
+        JOIN vehicles v
+            ON t.vehicle_id = v.id
+
+        JOIN drivers d
+            ON t.driver_id = d.id
+
+        WHERE t.id = ?
+        `,
+        [tripId]
+    );
+
+    if (rows.length === 0) {
+        throw new Error("Trip not found");
+    }
+
+    return rows[0];
+
+};
 module.exports = {
     createTrip,
     dispatchTrip,
     completeTrip,
-    getAllTrips
+    getAllTrips,
+    cancelTrip,
+    getTripById
 };
