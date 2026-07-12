@@ -44,7 +44,7 @@ router.patch(
 router.patch(
     "/:id/complete",
     auth,
-    authorize("DISPATCHER"),
+    authorize("DISPATCHER","FLEET_MANAGER"),
     tripController.completeTrip
 );
 
